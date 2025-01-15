@@ -23,13 +23,20 @@
 # include <stdlib.h>
 # include <unistd.h>
 
+typedef struct s_gnl
+{
+	char	*buffer;
+	char	*line;
+	char	*ptr;
+}			t_gnl;
+
 // Declarations from get_next_line_utils.c
-void	*ft_memmove(void *dest, const void *src, size_t n);
-char	*ft_strdup(const char *str);
-char	*ft_strchr(const char *str, int c);
-size_t	ft_strlen(const char *str);
-size_t	ft_strlcpy(char *dest, const char *src, size_t size);
+void		*ft_memmove(void *dest, const void *src, size_t n);
+char		*ft_strdup(const char *str);
+char		*ft_strchr(const char *str, int c);
+size_t		ft_strlen(const char *str);
+size_t		ft_strlcpy(char *dest, const char *src, size_t size);
 // Declarations from get_next_line.c
-char	*get_next_line(int fd);
+char		*get_next_line(int fd);
 
 #endif

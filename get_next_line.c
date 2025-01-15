@@ -39,72 +39,72 @@ static char	*ft_strappend(char *dest, char *to_append)
 	return (new_str);
 }
 
-static char	**buffer_check_nl(char **buffer)
+static t_gnl	*buffer_check_nl(t_gnl *gnl)
 {
-	buffer[2] = ft_strchr(buffer[1], '\n');
-	if (buffer[2])
+	gnl->ptr = ft_strchr(gnl->buffer, '\n');
+	if (gnl->ptr)
 	{
-		*buffer[2] = '\0';
-		buffer[0] = ft_strappend(buffer[0], buffer[1]);
-		buffer[0] = ft_strappend(buffer[0], "\n");
-		ft_memmove(buffer[1], buffer[2] + 1, ft_strlen(buffer[2] + 1) + 1);
+		*gnl->ptr = '\0';
+		gnl->line = ft_strappend(gnl->line, gnl->buffer);
+		gnl->line = ft_strappend(gnl->line, "\n");
+		ft_memmove(gnl->buffer, gnl->ptr + 1, ft_strlen(gnl->ptr + 1) + 1);
 	}
 	else
 	{
-		buffer[0] = ft_strappend(buffer[0], buffer[1]);
-		*buffer[1] = '\0';
+		gnl->line = ft_strappend(gnl->line, gnl->buffer);
+		gnl->buffer[0] = '\0';
 	}
-	return (buffer);
+	return (gnl);
 }
 
-static char	**get_new_buffer(int fd, char **buffer)
+static t_gnl	*get_new_buffer(int fd, t_gnl *gnl)
 {
 	int	bytes_read;
 
-	buffer_check_nl(buffer);
-	if (buffer[2] || !buffer[0])
-		return (buffer);
-	while (!buffer[2])
+	buffer_check_nl(gnl);
+	if (gnl->ptr || !gnl->line)
+		return (gnl);
+	while (!gnl->ptr)
 	{
-		bytes_read = read(fd, buffer[1], BUFFER_SIZE);
+		bytes_read = read(fd, gnl->buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{
-			free(buffer[0]);
-			buffer[0] = NULL;
+			free(gnl->line);
+			gnl->line = NULL;
 			break ;
 		}
-		buffer[1][bytes_read] = '\0';
+		gnl->buffer[bytes_read] = '\0';
 		if (bytes_read == 0)
 			break ;
-		buffer_check_nl(buffer);
+		buffer_check_nl(gnl);
 	}
-	return (buffer);
+	return (gnl);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer[1024][4] = {{NULL}};
+	static t_gnl	gnl[1024] = {{NULL, NULL, NULL}};
 
 	if (fd < 0 || fd > 1024 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (!buffer[fd][1])
+	if (!gnl[fd].buffer)
 	{
-		buffer[fd][1] = (char *)malloc(BUFFER_SIZE + 1 * sizeof(char));
-		if (!buffer[fd][1])
+		gnl[fd].buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+		if (!gnl[fd].buffer)
 			return (NULL);
-		buffer[fd][1][0] = '\0';
+		gnl[fd].buffer[0] = '\0';
 	}
-	buffer[fd][0] = ft_strdup("");
-	get_new_buffer(fd, buffer[fd]);
-	if (buffer[fd][0] && buffer[fd][0][0] == '\0')
+	gnl[fd].line = ft_strdup("");
+	get_new_buffer(fd, &gnl[fd]);
+	if (gnl[fd].line && gnl[fd].line[0] == '\0')
 	{
-		free(buffer[fd][0]);
-		buffer[fd][0] = NULL;
+		free(gnl[fd].line);
+		gnl[fd].line = NULL;
 	}
-	if (!buffer[fd][0])
+	if (!gnl[fd].line)
 	{
-		free(buffer[fd][1]);
-		buffer[fd][1] = NULL;
+		free(gnl[fd].buffer);
+		gnl[fd].buffer = NULL;
 	}
-	return (buffer[fd][0]);
+	return (gnl[fd].line);
 }
