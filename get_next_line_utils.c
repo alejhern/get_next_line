@@ -77,25 +77,21 @@ char	*ft_strchr(const char *str, int c)
 	return (NULL);
 }
 
-char	*ft_strjoin(char *s1, char *s2, int put_nl)
+size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 {
-	size_t	t_size;
-	size_t	s1_size;
+	size_t	len_src;
+	size_t	index;
 
-	if (!s1 && !s2)
-		return (NULL);
-	if (!s1)
-		return (ft_strdup(s2));
-	if (!s2)
-		return (s1);
-	s1_size = ft_strlen(s1);
-	t_size = s1_size + ft_strlen(s2) + 1 + put_nl;
-	s1 = (char *)ft_realloc(s1, t_size * sizeof(char));
-	if (!s1)
-		return (NULL);
-	while (*s2)
-		s1[s1_size++] = *s2++;
-	if (put_nl)
-		s1[s1_size++] = '\n';
-	return (s1);
+	len_src = ft_strlen(src);
+	index = 0;
+	if (size)
+	{
+		while (src[index] && index < (size - 1))
+		{
+			dest[index] = src[index];
+			index++;
+		}
+		dest[index] = '\0';
+	}
+	return (len_src);
 }

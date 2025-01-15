@@ -27,10 +27,9 @@
 void	*ft_memmove(void *dest, const void *src, size_t n);
 char	*ft_strdup(const char *str);
 char	*ft_strchr(const char *str, int c);
-char	*ft_strjoin(char *s1, char *s2, int put_nl);
 size_t	ft_strlen(const char *str);
+size_t	ft_strlcpy(char *dest, const char *src, size_t size);
 // Declarations from get_next_line.c
-void	*ft_calloc(size_t nmemb, size_t size);
-void	*ft_realloc(void *ptr, size_t new_size);
 char	*get_next_line(int fd);
+
 #endif

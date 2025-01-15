@@ -12,48 +12,31 @@
 
 #include "get_next_line.h"
 
-void	*ft_calloc(size_t nmemb, size_t size)
+static char	*ft_strappend(char *dest, char *to_append)
 {
-	size_t			t_size;
-	void			*arr;
-	unsigned char	*arr_ptr;
-	size_t			index;
+	size_t	dest_len;
+	size_t	to_append_len;
+	char	*new_str;
 
-	if (nmemb > 0 && size > 0 && nmemb > SIZE_MAX / size)
+	if (!dest && !to_append)
 		return (NULL);
-	t_size = nmemb * size;
-	arr = malloc(t_size);
-	if (!arr)
-		return (NULL);
-	arr_ptr = (unsigned char *)arr;
-	index = 0;
-	while (index < t_size)
+	if (!to_append)
+		return (dest);
+	if (!dest)
+		return (ft_strdup(to_append));
+	dest_len = ft_strlen(dest);
+	to_append_len = ft_strlen(to_append);
+	new_str = (char *)malloc(dest_len + to_append_len + 1 * sizeof(char));
+	if (!new_str)
 	{
-		*arr_ptr++ = '\0';
-		index++;
-	}
-	return (arr);
-}
-
-void	*ft_realloc(void *ptr, size_t new_size)
-{
-	void	*new_ptr;
-
-	if (!new_size)
-	{
-		free(ptr);
+		free(dest);
 		return (NULL);
 	}
-	new_ptr = ft_calloc(new_size, sizeof(char));
-	if (ptr && new_ptr)
-	{
-		if (ft_strlen(ptr) + 1 < new_size)
-			ft_memmove(new_ptr, ptr, ft_strlen(ptr) + 1);
-		else
-			ft_memmove(new_ptr, ptr, new_size);
-	}
-	free(ptr);
-	return (new_ptr);
+	ft_strlcpy(new_str, dest, dest_len + 1);
+	free(dest);
+	ft_strlcpy(new_str + dest_len, to_append, to_append_len + 1);
+	new_str[dest_len + to_append_len] = '\0';
+	return (new_str);
 }
 
 static char	**buffer_check_nl(char **buffer)
@@ -62,12 +45,13 @@ static char	**buffer_check_nl(char **buffer)
 	if (buffer[2])
 	{
 		*buffer[2] = '\0';
-		buffer[0] = ft_strjoin(buffer[0], buffer[1], 1);
+		buffer[0] = ft_strappend(buffer[0], buffer[1]);
+		buffer[0] = ft_strappend(buffer[0], "\n");
 		ft_memmove(buffer[1], buffer[2] + 1, ft_strlen(buffer[2] + 1) + 1);
 	}
 	else
 	{
-		buffer[0] = ft_strjoin(buffer[0], buffer[1], 0);
+		buffer[0] = ft_strappend(buffer[0], buffer[1]);
 		*buffer[1] = '\0';
 	}
 	return (buffer);
@@ -105,9 +89,10 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (!buffer[fd][1])
 	{
-		buffer[fd][1] = (char *)ft_calloc((BUFFER_SIZE + 1), sizeof(char));
+		buffer[fd][1] = (char *)malloc(BUFFER_SIZE + 1 * sizeof(char));
 		if (!buffer[fd][1])
 			return (NULL);
+		buffer[fd][1][0] = '\0';
 	}
 	buffer[fd][0] = ft_strdup("");
 	get_new_buffer(fd, buffer[fd]);
