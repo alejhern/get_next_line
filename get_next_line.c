@@ -26,7 +26,7 @@ static char	*ft_strappend(char *dest, char *to_append)
 		return (ft_strdup(to_append));
 	dest_len = ft_strlen(dest);
 	to_append_len = ft_strlen(to_append);
-	new_str = (char *)malloc(dest_len + to_append_len + 1 * sizeof(char));
+	new_str = (char *)malloc((dest_len + to_append_len + 1) * sizeof(char));
 	if (!new_str)
 	{
 		free(dest);
